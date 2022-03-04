@@ -175,7 +175,9 @@ class _AddBudgetState extends State<AddBudget> {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color:amount.text.isNotEmpty ? Const.primaryColor : grey.withOpacity(0.4),
+                          color: amount.text.isNotEmpty
+                              ? Const.primaryColor
+                              : grey.withOpacity(0.4),
                           width: 2,
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -194,10 +196,12 @@ class _AddBudgetState extends State<AddBudget> {
                               bloc.addBudget(budget);
                               Navigator.pop(context);
                             },
-                      child:Text(
+                      child: Text(
                         "Kaydet",
                         style: TextStyle(
-                          color:amount.text.isNotEmpty ? Const.primaryColor : grey.withOpacity(0.4),
+                          color: amount.text.isNotEmpty
+                              ? Const.primaryColor
+                              : grey.withOpacity(0.4),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -224,7 +228,7 @@ class _AddBudgetState extends State<AddBudget> {
               actionsAlignment: MainAxisAlignment.spaceBetween,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(300), bottom: Radius.circular(20)),
+                    top: Radius.circular(300), bottom: Radius.circular(45)),
               ),
               content: SizedBox(
                 height: 280,
@@ -238,8 +242,11 @@ class _AddBudgetState extends State<AddBudget> {
               actions: [
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: grey, width: 1),
-                    primary: grey,
+                    shape: const StadiumBorder(),
+                    side: BorderSide(color: grey.withOpacity(0.4), width: 1),
+                    primary: bloc.isDarkTheme
+                        ? white.withOpacity(0.2)
+                        : black.withOpacity(0.4),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
@@ -254,15 +261,19 @@ class _AddBudgetState extends State<AddBudget> {
                 ),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Const.primaryColor, width: 1),
-                    primary: Const.primaryColor,
+                    shape: const StadiumBorder(),
+                    side: BorderSide(
+                        color: bloc.isDarkTheme ? white : black, width: 1),
+                    primary: bloc.isDarkTheme
+                        ? white.withOpacity(0.2)
+                        : black.withOpacity(0.2),
                   ),
                   onPressed: () {
                     Navigator.pop(context, color);
                   },
-                  child: const Text(
+                  child: Text(
                     "Tamam",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold,color:bloc.isDarkTheme ? white : black,),
                   ),
                 ),
               ],

@@ -18,8 +18,8 @@ class Ticket extends StatefulWidget {
     this.dividerPadding = 2,
     this.dividerHeight = 3,
     this.dividerWidth = 5,
-    this.bottomClipHeight=10,
-    this.bottomClipWidth=15,
+    this.bottomClipHeight = 10,
+    this.bottomClipWidth = 15,
   }) : super(key: key);
 
   @override
@@ -37,73 +37,68 @@ class _TicketState extends State<Ticket> {
               Positioned.fill(
                 child: Padding(
                   padding: const EdgeInsets.all(0.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                            blurRadius: 16,
-                            color: Const.primaryColor.withOpacity(0.7)),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          flex: 7,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: 7,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: bloc.isDarkTheme
+                                ? Const.backgroundColor
+                                : grey.withOpacity(0.2),
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      ClipPath(
+                        clipper: TicketClipper(),
+                        child: Container(
+                          height: 20,
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                          ),
+                          color: bloc.isDarkTheme
+                              ? Const.backgroundColor
+                              : grey.withOpacity(0.2),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              double max = constraints.maxWidth;
+                              int count = max ~/
+                                  (widget.dividerWidth +
+                                      (2 * widget.dividerPadding));
+                              return Row(
+                                children: List.generate(count, (index) {
+                                  return Container(
+                                    height: widget.dividerHeight,
+                                    width: widget.dividerWidth,
+                                    decoration: BoxDecoration(
+                                      color: grey,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: widget.dividerPadding),
+                                  );
+                                }),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: ClipPath(
+                          clipper: TicketClipper2(
+                              width: widget.bottomClipWidth,
+                              height: widget.bottomClipHeight),
                           child: Container(
-                            decoration: BoxDecoration(
-                              color: bloc.isDarkTheme ? Const.backgroundColor : white,
-                              borderRadius:const BorderRadius.vertical(
-                                top: Radius.circular(8),
-                              ),
-                            ),
+                            color: bloc.isDarkTheme ? Const.backgroundColor : grey.withOpacity(0.2),
                           ),
                         ),
-                        ClipPath(
-                          clipper: TicketClipper(),
-                          child: Container(
-                            height: 20,
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15,
-                            ),
-                            decoration: BoxDecoration(
-                              color: bloc.isDarkTheme ? Const.backgroundColor : white,
-                            ),
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                double max = constraints.maxWidth;
-                                int count = max ~/
-                                    (widget.dividerWidth +
-                                        (2 * widget.dividerPadding));
-                                return Row(
-                                  children: List.generate(count, (index) {
-                                    return Container(
-                                      height: widget.dividerHeight,
-                                      width: widget.dividerWidth,
-                                      decoration: BoxDecoration(
-                                        color: grey,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      margin: EdgeInsets.symmetric(
-                                          horizontal: widget.dividerPadding),
-                                    );
-                                  }),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: ClipPath(
-                            clipper: TicketClipper2(width: widget.bottomClipWidth, height: widget.bottomClipHeight),
-                            child: Container(
-                              color: bloc.isDarkTheme ? Const.backgroundColor : white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -140,20 +135,20 @@ class TicketClipper extends CustomClipper<Path> {
 
     // path.quadraticBezierTo(w-(1.3*half), half, w, h);
 
-    double s=1.8;
+    double s = 1.8;
 
-    path.quadraticBezierTo(w-half, s, w-half, half);
-    path.quadraticBezierTo(w-half, h-s, w, h);
+    path.quadraticBezierTo(w - half, s, w - half, half);
+    path.quadraticBezierTo(w - half, h - s, w, h);
 
     // path.lineTo(w, h);
     path.lineTo(0, h);
 
-    path.quadraticBezierTo(half, h-s, half, half);
+    path.quadraticBezierTo(half, h - s, half, half);
     path.quadraticBezierTo(half, s, 0, 0);
     // path.quadraticBezierTo((1.3*half), half, 0, 0);
-    
+
     // path.lineTo(half, half);
-    
+
     return path;
   }
 

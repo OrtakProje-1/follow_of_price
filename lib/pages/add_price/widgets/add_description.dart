@@ -33,7 +33,7 @@ class _AddDescriptionState extends State<AddDescription> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 16,
+                radius: 20,
                 backgroundColor: widget.isExpenses ? red : green,
                 child: Icon(
                   widget.isExpenses

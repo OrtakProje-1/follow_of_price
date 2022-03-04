@@ -156,7 +156,7 @@ class _ExpenseSalaryDetailsState extends State<ExpenseSalaryDetails> {
                               20.height,
                               Column(
                                 children: prices
-                                    .map((e) => Const.buildLatestWidget(e))
+                                    .map((e) => Const.buildLatestWidget(e,context))
                                     .toList(),
                               ),
                             ],

@@ -28,8 +28,21 @@ class _DailyPageState extends State<DailyPage> {
             stream: bloc.userStream,
             initialData: bloc.user,
             builder: (context, userSnap) {
+              DateTime time=DateTime.now();
+              String msg="Hoş Geldin";
+
+              if(time.hour>6&&time.hour<=12){
+                msg="Günaydın";
+              }else if(time.hour>12&&time.hour<=18){
+                msg="Tünaydın";
+              }else if(time.hour>18&&time.hour<21){
+                msg="İyi Akşamlar";
+              }else{
+                msg="İyi Geceler";
+              }
+
               User user = userSnap.data!;
-              return Const.buildContent("Hoş Geldin, ${user.name}!",
+              return Const.buildContent("$msg, ${user.name}!",
                   textSize: 17);
             }),
         backgroundColor: bloc.isDarkTheme ? black : white,
@@ -55,8 +68,8 @@ class _DailyPageState extends State<DailyPage> {
               color: bloc.isDarkTheme ? black : white,
               boxShadow: [
                 BoxShadow(
-                  blurRadius: 4,
-                  color: grey.withOpacity(0.5),
+                  blurRadius: 8,
+                  color: grey.withOpacity(0.2),
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -131,7 +144,7 @@ class _DailyPageState extends State<DailyPage> {
                                   children: bloc
                                       .getPricesFromDay(initialDate)
                                       .map((e) {
-                                    return Const.buildLatestWidget(e);
+                                    return Const.buildLatestWidget(e,context);
                                   }).toList(),
                                 ),
                         );

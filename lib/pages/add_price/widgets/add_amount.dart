@@ -36,7 +36,7 @@ class _AddAmountState extends State<AddAmount> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 16,
+                    radius: 20,
                     backgroundColor: widget.isExpenses ? red : green,
                     child: Icon(
                       widget.isExpenses
@@ -93,24 +93,42 @@ class _AddAmountState extends State<AddAmount> {
                           cursorRadius: const Radius.circular(6),
                           cursorColor: Const.primaryColor,
                           style: TextStyle(
-                            color:bloc.isDarkTheme ? white : black,
+                            color: bloc.isDarkTheme ? white : black,
                             fontWeight: FontWeight.bold,
                           ),
                           decoration: InputDecoration(
-                              suffixIcon: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, top: 13),
-                                child: Text(
-                                  "₺",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                    color: bloc.isDarkTheme ? white : black,
-                                  ),
+                              // prefixIcon: Padding(
+                              //   padding:
+                              //       const EdgeInsets.only(top: 13),
+                              //   child: Text(
+                              //     "₺",
+                              //     style: TextStyle(
+                              //       fontWeight: FontWeight.bold,
+                              //       fontSize: 17,
+                              //       color: bloc.isDarkTheme ? white : black,
+                              //     ),
+                              //   ),
+                              // ),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  Const.showCalculateSheet(context,
+                                          initial:
+                                              double.tryParse(amount.text) ?? 0)
+                                      .then((value) {
+                                    if (value != null) {
+                                      amount.text = value.toStringAsFixed(2);
+                                      setState(() {});
+                                    }
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.calculate,
+                                  color: bloc.isDarkTheme ? white : black,
                                 ),
                               ),
+                              isCollapsed: true,
                               contentPadding:
-                                  const EdgeInsets.symmetric(vertical: 12),
+                                  const EdgeInsets.only(top: 15, left: 0),
                               border: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Const.primaryColor.withOpacity(0.4),
@@ -128,7 +146,7 @@ class _AddAmountState extends State<AddAmount> {
                                   color: grey.withOpacity(0.7)),
                               hintText:
                                   (widget.isExpenses ? "Gider" : "Gelir") +
-                                      " Fiyatı"),
+                                      " Fiyatı (₺)"),
                         ),
                         const SizedBox(
                           height: 12,
@@ -142,7 +160,9 @@ class _AddAmountState extends State<AddAmount> {
                   RawMaterialButton(
                     fillColor: amount.text.isEmpty
                         ? grey.withOpacity(0.5)
-                        : bloc.isDarkTheme ? white : Const.primaryColor,
+                        : bloc.isDarkTheme
+                            ? white
+                            : Const.primaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

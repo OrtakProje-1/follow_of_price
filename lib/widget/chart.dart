@@ -53,9 +53,7 @@ class _ChartState extends State<Chart> {
               );
             },
           ),
-          leftTitles: SideTitles(
-            showTitles: false
-          ),
+          leftTitles: SideTitles(showTitles: false),
           rightTitles: SideTitles(
             showTitles: false,
           ),
@@ -100,10 +98,14 @@ class _ChartState extends State<Chart> {
                         : e.y.toString() + " ₺",
                     TextStyle(
                       color: e.barIndex == index
-                          ? bloc.isDarkTheme ? white : black
+                          ? bloc.isDarkTheme
+                              ? white
+                              : black
                           : e.barIndex == 0
                               ? primary
-                              :bloc.isDarkTheme ? white: Const.primaryColor,
+                              : bloc.isDarkTheme
+                                  ? white
+                                  : Const.primaryColor,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -112,7 +114,11 @@ class _ChartState extends State<Chart> {
                         text: e.barIndex == index ? e.y.toString() + " ₺" : "",
                         style: TextStyle(
                           fontSize: 12,
-                          color: e.barIndex == 0 ? primary :bloc.isDarkTheme ? white : Const.primaryColor,
+                          color: e.barIndex == 0
+                              ? primary
+                              : bloc.isDarkTheme
+                                  ? white
+                                  : Const.primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -136,7 +142,10 @@ class _ChartState extends State<Chart> {
             gradientTo: const Offset(0.5, 0),
             gradientFrom: const Offset(0.5, 1),
             belowBarData: BarAreaData(
-              colors: [primary.withOpacity(1)],
+              show: true,
+              colors: [
+                primary.withOpacity(.1),
+              ],
             ),
           ),
           LineChartBarData(

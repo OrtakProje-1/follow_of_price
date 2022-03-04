@@ -26,7 +26,16 @@ void main() async {
         .map((e) => User.fromJson(e))
         .toList();
     if (users.isNotEmpty) {
-      bloc.changeUser(users.first);
+      String? uid = datasBox!.get("currentUser");
+      if (uid != null) {
+        int id=int.parse(uid);
+        int index= users.indexWhere((element) => element.id==id);
+        if(index!=-1){
+          bloc.changeUser(users[index]);
+        }
+      } else {
+        bloc.changeUser(users.first);
+      }
     }
     isHaveUser = users.isNotEmpty;
   }
@@ -53,7 +62,7 @@ class _MainState extends State<Main> {
       initTheme: themeData,
       builder: (c, theme) {
         return MaterialApp(
-          title: "FollowPrice",
+          title: "Bütçem",
           debugShowCheckedModeBanner: false,
           home: widget.isHaveUser ? const RootApp() : const CreateUser(),
           color: Const.backgroundColor,

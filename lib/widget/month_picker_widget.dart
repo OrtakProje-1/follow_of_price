@@ -29,7 +29,7 @@ class _MonthPickerWidgetState extends State<MonthPickerWidget> {
         color: bloc.isDarkTheme ? black : white,
         boxShadow: [
           BoxShadow(
-            blurRadius: 4,
+            blurRadius: 8,
             color: grey.withOpacity(0.2),
             offset: const Offset(0, 4),
           ),

@@ -7,24 +7,24 @@ import 'package:follow_of_price/util/const.dart';
 import 'package:follow_of_price/widget/background.dart';
 import 'package:follow_of_price/widget/user_avatar.dart';
 
-class CreatBudgetPage extends StatefulWidget {
-  const CreatBudgetPage({Key? key}) : super(key: key);
+class CreatPricePage extends StatefulWidget {
+  const CreatPricePage({Key? key}) : super(key: key);
 
   @override
-  _CreatBudgetPageState createState() => _CreatBudgetPageState();
+  _CreatPricePageState createState() => _CreatPricePageState();
 }
 
-class _CreatBudgetPageState extends State<CreatBudgetPage> {
+class _CreatPricePageState extends State<CreatPricePage> {
   int activeCategory = 0;
-  
+
   @override
   Widget build(BuildContext context) {
     return BackgroundWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-           automaticallyImplyLeading: false,
-          title: Const.buildContent("Gelir-Gider Ekle",textSize: 17),
+          automaticallyImplyLeading: false,
+          title: Const.buildContent("Gelir-Gider Ekle", textSize: 17),
           centerTitle: true,
           backgroundColor: Colors.transparent,
           actions: const [
@@ -45,11 +45,22 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
         const SizedBox(
           height: 20,
         ),
-        SizedBox(
-          height: 150,
-          child: Image.asset(
-            "assets/images/people.png",
-          ),
+        StreamBuilder<ThemeMode>(
+          stream: bloc.theme,
+          builder: (context, theme) {
+            return Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  invertColors:bloc.isDarkTheme,
+                  colorFilter: ColorFilter.mode(bloc.isDarkTheme ? grey : white, BlendMode.color),
+                  image:const AssetImage("assets/gifs/shop.gif"),
+                ),
+              ),
+            );
+          }
         ),
         const SizedBox(
           height: 20,
@@ -57,7 +68,6 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            
             RawMaterialButton(
               splashColor: green.withOpacity(0.5),
               onPressed: () {
@@ -73,7 +83,9 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
                 padding: const EdgeInsets.all(6),
                 height: 90,
                 decoration: BoxDecoration(
-                  color:bloc.isDarkTheme ? white.withOpacity(0.1) : white.withOpacity(0.7),
+                  color: bloc.isDarkTheme
+                      ? white.withOpacity(0.1)
+                      : white.withOpacity(0.7),
                   boxShadow: [
                     BoxShadow(
                         blurRadius: 20, color: Colors.black.withOpacity(0.1)),
@@ -123,7 +135,9 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
                     BoxShadow(
                         blurRadius: 20, color: Colors.black.withOpacity(0.1)),
                   ],
-                  color: bloc.isDarkTheme ? white.withOpacity(0.1) : white.withOpacity(0.7),
+                  color: bloc.isDarkTheme
+                      ? white.withOpacity(0.1)
+                      : white.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -154,6 +168,61 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
             ),
           ],
         ),
+        12.height,
+        Row(
+          children: [
+            Expanded(
+              child: RawMaterialButton(
+                splashColor: black.withOpacity(0.5),
+                onPressed: () {
+                  context.push(const AddPrice(isExpenses: false)).then((value) {
+                    setState(() {});
+                  });
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  width: double.maxFinite,
+                  padding: const EdgeInsets.all(6),
+                  height: 90,
+                  decoration: BoxDecoration(
+                    color: bloc.isDarkTheme
+                        ? white.withOpacity(0.1)
+                        : white.withOpacity(0.7),
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 20, color: Colors.black.withOpacity(0.1)),
+                    ],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.transparent,
+                        child: Icon(
+                          Icons.timelapse_sharp,
+                          color: black,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Text(
+                        "Taksit Ekle",
+                        style:
+                            TextStyle(color: black, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(
           height: 12,
         ),
@@ -162,7 +231,11 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
           children: [
             Text(
               "Geçmiş Girdiler",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19,color: bloc.isDarkTheme ? white : black,),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 19,
+                color: bloc.isDarkTheme ? white : black,
+              ),
             ),
             Container(
               constraints: const BoxConstraints(
@@ -172,7 +245,10 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
                   borderRadius: BorderRadius.circular(6)),
               child: PopupMenuButton(
                 padding: const EdgeInsets.all(0),
-                icon: Icon(Icons.sort,color: bloc.isDarkTheme ? white : black,),
+                icon: Icon(
+                  Icons.sort,
+                  color: bloc.isDarkTheme ? white : black,
+                ),
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6)),
@@ -199,16 +275,20 @@ class _CreatBudgetPageState extends State<CreatBudgetPage> {
           ],
         ),
         6.height,
-        Column(
-          children: bloc.prices.map((e) {
-            return Const.buildLatestWidget(e);
-          }).toList(),
+        StreamBuilder<List<Price>>(
+          stream: bloc.pricesStream,
+          initialData: bloc.prices,
+          builder: (context, pricesSnap){
+            return Column(
+              children: pricesSnap.data!.map((e) {
+                return Const.buildLatestWidget(e, context);
+              }).toList(),
+            );
+          }
         ),
       ],
     );
   }
-
-  
 
   // SingleChildScrollView buildCategoryCard() {
   //   return SingleChildScrollView(

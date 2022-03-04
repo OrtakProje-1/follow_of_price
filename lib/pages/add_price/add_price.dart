@@ -59,14 +59,18 @@ class _AddPriceState extends State<AddPrice> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.close_rounded,color: bloc.isDarkTheme ? white : black,)),
+              icon: Icon(
+                Icons.close_rounded,
+                color: bloc.isDarkTheme ? white : black,
+              )),
           title: Const.buildContent((isExpenses ? "Gider" : "Gelir") + " Ekle"),
         ),
         body: Column(
           children: [
             if (page < 5)
               LinearProgressIndicator(
-                backgroundColor:bloc.isDarkTheme ? white.withOpacity(0.1) : Colors.white,
+                backgroundColor:
+                    bloc.isDarkTheme ? white.withOpacity(0.1) : Colors.white,
                 color: Const.primaryColor,
                 value: min(
                   1,
@@ -137,28 +141,19 @@ class _AddPriceState extends State<AddPrice> {
                     isExpenses: isExpenses,
                     finishPage: (s) async {
                       paymentMethod = s;
-                      bloc.addPrice(
-                        Price(
-                          amount: amount,
-                          time: time,
-                          isExpense: isExpenses,
-                          category: defaultCategory!,
-                          description: description,
-                          paymentMethod:
-                              paymentMethod ?? Const.paymentMethods[1],
-                        ),
+                      Price price = Price(
+                        id: DateTime.now().millisecondsSinceEpoch,
+                        amount: amount,
+                        time: time,
+                        isExpense: isExpenses,
+                        category: defaultCategory!,
+                        description: description,
+                        paymentMethod: paymentMethod ?? Const.paymentMethods[1],
                       );
+                      bloc.addPrice(price);
                       context.push(
                         CongratulationPage(
-                          price: Price(
-                            amount: amount,
-                            time: time,
-                            isExpense: isExpenses,
-                            category: defaultCategory!,
-                            description: description,
-                            paymentMethod:
-                                paymentMethod ?? Const.paymentMethods[1],
-                          ),
+                          price: price,
                         ),
                       );
                     },

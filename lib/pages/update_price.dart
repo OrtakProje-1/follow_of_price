@@ -1,13 +1,14 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:follow_of_price/models/category.dart';
 import 'package:follow_of_price/models/payment_method.dart';
 import 'package:follow_of_price/models/price.dart';
+import 'package:follow_of_price/pages/root_app.dart';
 import 'package:follow_of_price/providers/global.dart';
 import 'package:follow_of_price/theme/colors.dart';
 import 'package:follow_of_price/util/const.dart';
 import 'package:follow_of_price/widget/background.dart';
+import 'package:follow_of_price/widget/calculator/ui.dart';
 
 class UpdatePrice extends StatefulWidget {
   const UpdatePrice({Key? key, required this.price}) : super(key: key);
@@ -49,7 +50,15 @@ class _UpdatePriceState extends State<UpdatePrice> {
         appBar: AppBar(
           centerTitle: true,
           automaticallyImplyLeading: false,
-          title: Const.buildContent("İşlem Güncelle"),
+          title: Const.buildContent("İşlem Güncelle", textSize: 17),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.keyboard_backspace_rounded,
+                color: bloc.isDarkTheme ? white : black,
+              )),
           backgroundColor: Colors.transparent,
         ),
         body: Column(
@@ -60,7 +69,10 @@ class _UpdatePriceState extends State<UpdatePrice> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: RawMaterialButton(
+                  child: customListTile(
+                    title: "İşlem Tipi",
+                    leadingBgColor: isExpenses ? red : green,
+                    content: isExpenses ? "Gider" : "Gelir",
                     onPressed: () async {
                       showPriceType().then((value) {
                         if (value != null) {
@@ -70,152 +82,64 @@ class _UpdatePriceState extends State<UpdatePrice> {
                         }
                       });
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,vertical: 10,
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 18,
-                            backgroundColor: isExpenses ? red : green,
-                            child: Icon(
-                              isExpenses
-                                  ? Icons.download_rounded
-                                  : Icons.upload_rounded,
-                              color: white,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 22,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "İşlem Tipi",
-                                style: TextStyle(color: grey, fontSize: 12),
-                              ),
-                              Text(
-                                isExpenses ? "Gider" : "Gelir",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 17,
-                                  color: bloc.isDarkTheme ? white : black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                    leadingChild: Icon(
+                      isExpenses
+                          ? Icons.download_rounded
+                          : Icons.upload_rounded,
+                      color: white,
                     ),
                   ),
                 ),
                 Expanded(
-                  child: RawMaterialButton(
+                  child: customListTile(
+                    title: "Fiyat",
+                    content: "₺" + amount.toStringAsFixed(2),
                     onPressed: () {
-                      showTextSheet(
-                        defaultValue: price.amount.toStringAsFixed(2),
+                      showTextSheet<double>(
+                        defaultValue: amount.toStringAsFixed(2),
                         isPrice: true,
-                      );
+                      ).then((value) {
+                        if (value != null) {
+                          setState(() {
+                            amount = value;
+                          });
+                        }
+                      });
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Fiyat",
-                            style: TextStyle(color: grey, fontSize: 12),
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                "₺" + amount.toString(),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                    color: bloc.isDarkTheme ? white : black,
-                                    overflow: TextOverflow.ellipsis),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
-            RawMaterialButton(
+            customListTile(
+              title: "Açıklama",
+              content: description,
               onPressed: () {
-                showTextSheet(
+                showTextSheet<String>(
                   defaultValue: description,
-                );
+                ).then((value) {
+                  if (value != null) {
+                    setState(() {
+                      description = value;
+                    });
+                  }
+                });
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 10,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    DottedBorder(
-                      dashPattern: const [3.3, 3.3],
-                      borderType: BorderType.Circle,
-                      color: Const.primaryColor,
-                      child: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: grey.withOpacity(0.2),
-                        child: Icon(
-                          Icons.info_outline_rounded,
-                          color: Const.primaryColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 22,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Açıklama",
-                          style: TextStyle(color: grey, fontSize: 12),
-                        ),
-                        Text(
-                          description,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
-                            color: bloc.isDarkTheme ? white : black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              leadingChild: const Icon(
+                Icons.info_outline_rounded,
+                color: Colors.blue,
+                size: 25,
               ),
             ),
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              onTap: () async {
+            customListTile(
+              title: "Kategori",
+              content: category.name,
+              onPressed: () {
                 Const.showCategorySheet(
-                        context,
-                        isExpenses
-                            ? Const.expensesCategories
-                            : Const.salaryCategories)
-                    .then((value) {
+                  context,
+                  isExpenses
+                      ? Const.expensesCategories
+                      : Const.salaryCategories,
+                ).then((value) {
                   if (value != null) {
                     setState(() {
                       category = value;
@@ -223,180 +147,137 @@ class _UpdatePriceState extends State<UpdatePrice> {
                   }
                 });
               },
-              dense: true,
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Const.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Const.svg(category.imagePath!, width: 25, height: 25),
-              ),
-              title: const Text(
-                "Kategori",
-                style: TextStyle(color: grey, fontSize: 12),
-              ),
-              subtitle: Text(
-                category.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: bloc.isDarkTheme ? white : black,
-                ),
+              leadingChild:
+                  Const.svg(category.imagePath!, width: 25, height: 25),
+            ),
+            customListTile(
+              title: "Tarih",
+              content: Const.getTimeText(time),
+              onPressed: showDateTimePickerSheet,
+              leadingChild: Icon(
+                Icons.date_range_outlined,
+                color: Const.primaryColor,
+                size: 25,
               ),
             ),
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              dense: true,
-              onTap: () {
-                DatePicker.showDatePicker(
-                  context,
-                  locale: LocaleType.tr,
-                  currentTime: time,
-                  showTitleActions: true,
-                  theme: DatePickerTheme(
-                    backgroundColor:
-                        bloc.isDarkTheme ? Const.backgroundColor : white,
-                    cancelStyle: TextStyle(
-                      color: grey.withOpacity(0.6),
-                      fontWeight: FontWeight.bold,
-                    ),
-                    itemStyle: TextStyle(
-                      color: bloc.isDarkTheme ? white : black,
-                    ),
-                    doneStyle: TextStyle(
-                      color: bloc.isDarkTheme ? white : Const.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ).then((value) {
-                  if (value != null) {
-                    setState(() {
-                      time = value;
-                    });
-                  }
-                });
+            customListTile(
+              title: "Ödeme Yöntemi",
+              content: paymentMethod.name,
+              onPressed: showPaymentMethodSheet,
+              leadingChild:
+                  Const.svg(paymentMethod.image, width: 25, height: 25),
+            ),
+            const Spacer(),
+            Const.outlinedButton(
+              "Güncelle",
+              onPressed: () {
+                Price price = widget.price.copyWith(
+                  category: category,
+                  amount: amount,
+                  description: description,
+                  isExpense: isExpenses,
+                  paymentMethod: paymentMethod,
+                  time: time,
+                );
+                print(price);
+                bloc.updatePrice(price);
+                context.pushReplacement(const RootApp());
               },
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Const.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Icon(
-                  Icons.date_range_outlined,
-                  color: Const.primaryColor,
-                ),
-              ),
-              title: const Text(
-                "Tarih",
-                style: TextStyle(color: grey, fontSize: 12),
-              ),
-              subtitle: Text(
-                Const.getTimeText(time),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: bloc.isDarkTheme ? white : black,
-                ),
-              ),
             ),
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              dense: true,
-              onTap: () async {
-                PaymentMethod? paymentMethod = await showModalBottomSheet(
-                    context: context,
-                    backgroundColor:
-                        bloc.isDarkTheme ? Const.backgroundColor : white,
-                    builder: (_) {
-                      return SizedBox(
-                        height: 200,
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Container(
-                                margin: const EdgeInsets.all(8),
-                                width: 90,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(22),
-                                    color: Colors.grey.shade300),
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: Const.paymentMethods.map((e) {
-                                  return ListTile(
-                                    dense: true,
-                                    tileColor: e == this.paymentMethod
-                                        ? Const.cardColor.withOpacity(0.15)
-                                        : Colors.transparent,
-                                    onTap: () {
-                                      Navigator.pop(context, e);
-                                    },
-                                    title: Text(
-                                      e.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: bloc.isDarkTheme ? white : black,
-                                      ),
-                                    ),
-                                    leading: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Const.primaryColor.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Const.svg(e.image,
-                                          width: 15, height: 15),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    });
-                if (paymentMethod != null) {
-                  setState(() {
-                    this.paymentMethod = paymentMethod;
-                  });
-                }
-              },
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Const.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Const.svg(paymentMethod.image, width: 25, height: 25),
-              ),
-              subtitle: Text(
-                paymentMethod.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: bloc.isDarkTheme ? white : black,
-                ),
-              ),
-              title: Text(
-                "Ödeme Yöntemi",
-                style: TextStyle(color: grey.withOpacity(0.6)),
-              ),
-            ),
+            8.height,
           ],
         ),
       ),
     );
+  }
+
+  void showDateTimePickerSheet() async {
+    DateTime? value = await DatePicker.showDatePicker(
+      context,
+      locale: LocaleType.tr,
+      currentTime: time,
+      showTitleActions: true,
+      theme: DatePickerTheme(
+        backgroundColor: bloc.isDarkTheme ? Const.backgroundColor : white,
+        cancelStyle: TextStyle(
+          color: grey.withOpacity(0.6),
+          fontWeight: FontWeight.bold,
+        ),
+        itemStyle: TextStyle(
+          color: bloc.isDarkTheme ? white : black,
+        ),
+        doneStyle: TextStyle(
+          color: bloc.isDarkTheme ? white : Const.primaryColor,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+    if (value != null) {
+      setState(() {
+        time = value;
+      });
+    }
+  }
+
+  void showPaymentMethodSheet() async {
+    PaymentMethod? paymentMethod = await showModalBottomSheet(
+        context: context,
+        backgroundColor: bloc.isDarkTheme ? Const.backgroundColor : white,
+        builder: (_) {
+          return SizedBox(
+            height: 200,
+            child: Column(
+              children: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    width: 90,
+                    height: 10,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        color: Colors.grey.shade300),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: Const.paymentMethods.map((e) {
+                      return ListTile(
+                        dense: true,
+                        tileColor: e == this.paymentMethod
+                            ? Const.cardColor.withOpacity(0.15)
+                            : Colors.transparent,
+                        onTap: () {
+                          Navigator.pop(context, e);
+                        },
+                        title: Text(
+                          e.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: bloc.isDarkTheme ? white : black,
+                          ),
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Const.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Const.svg(e.image, width: 15, height: 15),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+    if (paymentMethod != null) {
+      setState(() {
+        this.paymentMethod = paymentMethod;
+      });
+    }
   }
 
   Future<bool?> showPriceType() async {
@@ -405,7 +286,7 @@ class _UpdatePriceState extends State<UpdatePrice> {
         backgroundColor: bloc.isDarkTheme ? Const.backgroundColor : white,
         builder: (_) {
           return SizedBox(
-            height: 150,
+            height: 140,
             child: Column(
               children: [
                 Center(
@@ -424,29 +305,30 @@ class _UpdatePriceState extends State<UpdatePrice> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: List.generate(2, (index) {
                       bool isExp = index == 0;
-                      return ListTile(
-                        dense: true,
-                        tileColor: isExpenses == isExp
-                            ? Const.cardColor.withOpacity(0.15)
-                            : Colors.transparent,
-                        onTap: () {
-                          Navigator.pop(context, isExp);
-                        },
-                        title: Text(
-                          isExp ? "Gider" : "Gelir",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: bloc.isDarkTheme ? white : black,
+                      return Expanded(
+                        child: ListTile(
+                          tileColor: isExpenses == isExp
+                              ? Const.cardColor.withOpacity(0.15)
+                              : Colors.transparent,
+                          onTap: () {
+                            Navigator.pop(context, isExp);
+                          },
+                          title: Text(
+                            isExp ? "Gider" : "Gelir",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: bloc.isDarkTheme ? white : black,
+                            ),
                           ),
-                        ),
-                        leading: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: isExp ? red : green,
-                          child: Icon(
-                            isExpenses
-                                ? Icons.download_rounded
-                                : Icons.upload_rounded,
-                            color: white,
+                          leading: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: isExp ? red : green,
+                            child: Icon(
+                              isExp
+                                  ? Icons.download_rounded
+                                  : Icons.upload_rounded,
+                              color: white,
+                            ),
                           ),
                         ),
                       );
@@ -473,23 +355,137 @@ class _UpdatePriceState extends State<UpdatePrice> {
           margin: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          height: 120,
+          height: 150,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
             color: bloc.isDarkTheme ? Const.backgroundColor : white,
           ),
-          child: Center(
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              color: bloc.isDarkTheme ? Const.backgroundColor : white,
-              child: TextField(
-                controller: controller,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Const.buildContent(isPrice ? "Fiyat" : "Açıklama",
+                        color: grey.withOpacity(0.6)),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        primary: grey.withOpacity(0.4),
+                      ),
+                      onPressed: () {
+                        if (isPrice) {
+                          double? amount =
+                              double.tryParse(controller.text.trim());
+                          if (amount != null) {
+                            String amountString = amount.toStringAsFixed(2);
+                            amount = double.tryParse(amountString);
+                          }
+                          Navigator.pop(context, amount);
+                        } else {
+                          Navigator.pop(
+                              context,
+                              controller.text.trim().isNotEmpty
+                                  ? controller.text.trim()
+                                  : null);
+                        }
+                      },
+                      child: Const.buildContent("Kaydet"),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                color: bloc.isDarkTheme
+                    ? white.withOpacity(0.1)
+                    : Const.backgroundColor,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: TextField(
+                    autofocus: true,
+                    controller: controller,
+                    keyboardType: isPrice ? TextInputType.number : null,
+                    style: TextStyle(
+                      color: bloc.isDarkTheme ? white : black,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: isPrice ? "Fiyat" : "Açıklama",
+                      hintStyle: TextStyle(color: grey.withOpacity(0.4)),
+                      prefix: isPrice
+                          ? Padding(
+                              padding: const EdgeInsets.only(
+                                right: 8,
+                              ),
+                              child: Const.buildContent("₺"),
+                            )
+                          : null,
+                      suffixIcon:!isPrice ? null : IconButton(
+                        onPressed: () {
+                          Const.showCalculateSheet(context,initial: double.tryParse(controller.text)??0).then((value){
+                            if(value!=null){
+                              controller.text=value.toStringAsFixed(2);
+                              
+                            }
+                          });
+                        },
+                        icon: Icon(
+                          Icons.calculate,
+                          color: bloc.isDarkTheme ? white : black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
+    );
+  }
+
+  
+
+  Widget customListTile({
+    required String title,
+    required String content,
+    required VoidCallback onPressed,
+    Widget? leadingChild,
+    Color? leadingBgColor,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 15,
+      ),
+      onTap: onPressed,
+      dense: true,
+      leading: leadingChild == null
+          ? null
+          : CircleAvatar(
+              radius: 20.5,
+              backgroundColor:
+                  leadingBgColor ?? Const.primaryColor.withOpacity(0.1),
+              child: leadingChild,
+            ),
+      title: Text(
+        title,
+        style: const TextStyle(color: grey, fontSize: 12),
+      ),
+      subtitle: Text(
+        content,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: bloc.isDarkTheme ? white : black,
+        ),
+      ),
     );
   }
 }

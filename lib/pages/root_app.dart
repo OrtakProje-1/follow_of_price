@@ -1,6 +1,6 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:follow_of_price/pages/budget_page/budget_page.dart';
-import 'package:follow_of_price/pages/create_budge_page.dart';
+import 'package:follow_of_price/pages/create_price_page.dart';
 import 'package:follow_of_price/pages/daily_page.dart';
 import 'package:follow_of_price/pages/profile_page.dart';
 import 'package:follow_of_price/pages/stats_page.dart';
@@ -174,7 +174,7 @@ class _BodyState extends State<Body> {
         StatsPage(),
         BudgetPage(),
         ProfilePage(),
-        CreatBudgetPage()
+        CreatPricePage()
       ],
     );
   }

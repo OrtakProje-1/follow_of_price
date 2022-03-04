@@ -9,7 +9,8 @@ import 'package:follow_of_price/util/const.dart';
 import 'package:follow_of_price/widget/background.dart';
 
 class CreateUser extends StatefulWidget {
-  const CreateUser({Key? key}) : super(key: key);
+  final bool isProfile;
+  const CreateUser({Key? key,this.isProfile=false}) : super(key: key);
 
   @override
   State<CreateUser> createState() => _CreateUserState();
@@ -25,7 +26,7 @@ class _CreateUserState extends State<CreateUser> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        return false;
+        return widget.isProfile;
       },
       child: BackgroundWidget(
         child: Scaffold(
@@ -35,6 +36,32 @@ class _CreateUserState extends State<CreateUser> {
             centerTitle: true,
             backgroundColor: Colors.transparent,
             title: Const.buildContent("Yeni Hesap Oluştur", textSize: 17),
+            leading:!widget.isProfile ? null : IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.keyboard_backspace_rounded,
+              color: bloc.isDarkTheme ? white : black,
+            ),
+          ),
+            actions: [
+             if(!widget.isProfile) IconButton(
+                onPressed: () async {
+                  bool result= await Const.getBackup();
+                  if(result){
+                    List<User> users=Const.getUsers();
+                    if(users.isNotEmpty){
+                      bloc.changeUser(users.first);
+                      context.pushReplacement(const RootApp());
+                    }
+                  }
+                },
+                icon: const Icon(
+                  Icons.settings_backup_restore_rounded,
+                ),
+              ),
+            ],
           ),
           body: getBody(),
         ),

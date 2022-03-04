@@ -126,105 +126,132 @@ class _BudgetPageState extends State<BudgetPage> {
           boxShadow: [
             BoxShadow(
               color: bloc.isDarkTheme
-                  ? white.withOpacity(0.3)
-                  : black.withOpacity(0.3),
+                  ? white.withOpacity(0.15)
+                  : black.withOpacity(0.15),
               blurRadius: 16,
               // changes position of shadow
             ),
           ]),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 25, right: 25, bottom: 25, top: 25),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: Const.primaryColor.withOpacity(0.1),
-                  ),
-                  padding: const EdgeInsets.all(2),
-                  child: Const.svg(budget.category.imagePath!),
-                ),
-                4.width,
-                Text(
-                  budget.category.name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                    color: const Color(0xff67727d).withOpacity(0.6),
-                  ),
-                ),
-              ],
-            ),
-            10.height,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
+        children: [
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 25, right: 25, bottom: 25, top: 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      "₺" + different.toStringAsFixed(2),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: bloc.isDarkTheme ? white : black,
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: Const.primaryColor.withOpacity(0.1),
                       ),
+                      padding: const EdgeInsets.all(2),
+                      child: Const.svg(budget.category.imagePath!),
                     ),
-                    8.width,
-                    Padding(
-                      padding: const EdgeInsets.only(top: 3),
-                      child: Text(
-                        "%" + percentage.toStringAsFixed(1),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: const Color(0xff67727d).withOpacity(0.6)),
+                    4.width,
+                    Text(
+                      budget.category.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: const Color(0xff67727d).withOpacity(0.6),
                       ),
                     ),
                   ],
                 ),
+                10.height,
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "₺" + budget.amount.toStringAsFixed(2),
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          color: const Color(0xff67727d).withOpacity(0.6)),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          different.toStringAsFixed(2) + "₺",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: bloc.isDarkTheme ? white : black,
+                          ),
+                        ),
+                        8.width,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text(
+                            "%" + percentage.toStringAsFixed(1),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color:
+                                    const Color(0xff67727d).withOpacity(0.6)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          budget.amount.toStringAsFixed(2) + "₺",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              color: const Color(0xff67727d).withOpacity(0.6)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                15.height,
+                Stack(
+                  children: [
+                    Container(
+                      width: (context.width - 40),
+                      height: 4,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: primary.withOpacity(0.2),
+                      ),
+                    ),
+                    Container(
+                      width: (context.width - 40) * (percentage / 100),
+                      height: 4,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: budget.color,
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
-            15.height,
-            Stack(
-              children: [
-                Container(
-                  width: (context.width - 40),
-                  height: 4,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: primary.withOpacity(0.2),
-                  ),
-                ),
-                Container(
-                  width: (context.width - 40) * (percentage / 100),
-                  height: 4,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: budget.color,
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IconButton(
+              onPressed: () {
+                Const.showCheckDialog(
+                        context, "Bütçeyi silmek istediğine emin misin?")
+                    .then((value) {
+                  if (value != null) {
+                    if (value) {
+                      bloc.removeBudget(budget);
+                    }
+                  }
+                });
+              },
+              icon: Icon(
+                Icons.delete_outline,
+                color: bloc.isDarkTheme ? white : black,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,9 +1,15 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:follow_of_price/main.dart';
 import 'package:follow_of_price/models/budget.dart';
+import 'package:follow_of_price/models/category.dart';
+import 'package:follow_of_price/models/chart_model.dart';
 import 'package:follow_of_price/models/price.dart';
 import 'package:follow_of_price/models/save_model.dart';
 import 'package:follow_of_price/models/user.dart';
+import 'package:follow_of_price/pages/pie_chart.dart';
+import 'package:follow_of_price/theme/colors.dart';
 import 'package:follow_of_price/util/const.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -11,12 +17,14 @@ class Global extends ChangeNotifier {
   Global() {
     _pricesSubject = BehaviorSubject.seeded([]);
     _budgetsSubject = BehaviorSubject.seeded([]);
+    _userSubject = BehaviorSubject.seeded(null);
   }
 
   List<VoidCallback> themeListeners = [];
 
-  BehaviorSubject<ThemeMode> theme = BehaviorSubject.seeded(ThemeMode.light);
-  final BehaviorSubject<User?> _userSubject = BehaviorSubject();
+  late BehaviorSubject<ThemeMode> theme =
+      BehaviorSubject.seeded(ThemeMode.light);
+  late BehaviorSubject<User?> _userSubject;
 
   User? get user => _userSubject.value;
   ThemeMode get themeMode => theme.value;
@@ -42,6 +50,7 @@ class Global extends ChangeNotifier {
 
   void changeUser(User user) {
     _userSubject.add(user);
+    datasBox!.put("currentUser", user.id.toString());
     getUserDatas(user);
   }
 
@@ -52,11 +61,15 @@ class Global extends ChangeNotifier {
       users[index] = user;
       usersBox!.put("users", users.map((e) => e.toJson()).toList());
       _userSubject.add(user);
+      Const.showMsg("Kullanıcı Güncellendi");
+    } else {
+      Const.showMsg("Kullanıcı Güncellenemedi");
     }
   }
 
   void saveUserDatas() {
-    SaveModel saveModel = SaveModel(prices: prices, budgets: budgets);
+    SaveModel saveModel =
+        SaveModel(prices: prices, budgets: budgets, user: user!);
     datasBox!.put(user!.id.toString(), saveModel.toJson());
   }
 
@@ -80,8 +93,50 @@ class Global extends ChangeNotifier {
     List<Price> prices2 = prices;
     prices2.add(price);
     _pricesSubject.add(prices2);
+    Const.showMsg("İşlem Eklendi");
     saveUserDatas();
     notifyListeners();
+  }
+
+  void updatePrice(Price price) {
+    List<Price> allPrices = prices;
+    int index = allPrices.indexWhere((element) => element.id == price.id);
+
+    if (index != -1) {
+      allPrices[index] = price;
+      _pricesSubject.add(allPrices);
+      saveUserDatas();
+      Const.showMsg("Güncelleme Başarılı");
+    } else {
+      Const.showMsg("Güncelleme Başarısız");
+    }
+  }
+
+  void removePrice(Price price) {
+    List<Price> allPrices = prices;
+    int index = allPrices.indexWhere((element) => element == price);
+
+    if (index != -1) {
+      allPrices.removeAt(index);
+      _pricesSubject.add(allPrices);
+      saveUserDatas();
+      Const.showMsg("Silme işlemi Başarılı");
+    } else {
+      Const.showMsg("Silme İşlemi Başarısız");
+    }
+  }
+
+  void removeBudget(Budget budget) {
+    List<Budget> allBudgets = budgets;
+    int index = allBudgets.indexWhere((element) => element.id == budget.id);
+    if (index != -1) {
+      allBudgets.removeAt(index);
+      _budgetsSubject.add(allBudgets);
+      saveUserDatas();
+      Const.showMsg("Bütçe Silindi");
+    } else {
+      Const.showMsg("Bütçe Silinemedi");
+    }
   }
 
   void addBudget(Budget budget) {
@@ -97,7 +152,9 @@ class Global extends ChangeNotifier {
       );
       budgets2[index] = temp;
       _budgetsSubject.add(budgets2);
+      Const.showMsg("Bütçe Güncellendi");
     } else {
+      Const.showMsg("Bütçe Eklendi");
       budgets2.add(budget);
       _budgetsSubject.add(budgets2);
     }
@@ -140,6 +197,73 @@ class Global extends ChangeNotifier {
       amount += i.amount;
     }
     return amount;
+  }
+
+  List<ChartModel> getChartModelFromType(ChartType type) {
+    if (type == ChartType.all) {
+      return [
+        ChartModel(
+          name: "Gelir",
+          prices: salaryPrices,
+          color: isDarkTheme ? white : Const.primaryColor,
+        ),
+        ChartModel(name: "Gider", prices: expensesPrices, color: primary),
+      ];
+    } else if (type == ChartType.expenses) {
+      List<Color> colors = [];
+      return getCategoriesFromPrices(expensesPrices).map((e) {
+        Color color = randomColor();
+        while (colors.any((element) => element == color)) {
+          color = randomColor();
+        }
+        return ChartModel(
+          name: e.name,
+          prices: getPricesFromCategoryAndPrices(e, expensesPrices),
+          color: color,
+        );
+      }).toList();
+    } else {
+      List<Color> colors = [];
+      return getCategoriesFromPrices(salaryPrices).map((e) {
+        Color color = randomColor();
+        while (colors.any((element) => element == color)) {
+          color = randomColor();
+        }
+        return ChartModel(
+          name: e.name,
+          prices: getPricesFromCategoryAndPrices(e, salaryPrices),
+          color: color,
+        );
+      }).toList();
+    }
+  }
+
+  Color randomColor() {
+    int r = (Random().nextDouble() * 255).toInt();
+    int g = (Random().nextDouble() * 255).toInt();
+    int b = (Random().nextDouble() * 255).toInt();
+    return Color.fromARGB(255, r, g, b);
+  }
+
+  List<Price> getPricesFromCategoryAndPrices(
+      Category category, List<Price> prices) {
+    List<Price> filteredPrices = [];
+    for (var i in prices) {
+      if (i.category.id == category.id) {
+        filteredPrices.add(i);
+      }
+    }
+    return filteredPrices;
+  }
+
+  List<Category> getCategoriesFromPrices(List<Price> prices) {
+    List<Category> categories = [];
+    for (var i in prices) {
+      if (!categories.any((element) => element.id == i.category.id)) {
+        categories.add(i.category);
+      }
+    }
+    return categories;
   }
 
   double getTotalAmountPricesFromBudget(DateTime month, Budget budget) {

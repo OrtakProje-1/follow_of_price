@@ -1,5 +1,6 @@
 import 'package:follow_of_price/models/price.dart';
 import 'package:follow_of_price/pages/expense_salary_detail.dart';
+import 'package:follow_of_price/pages/pie_chart.dart';
 import 'package:follow_of_price/providers/global.dart';
 import 'package:follow_of_price/theme/colors.dart';
 import 'package:follow_of_price/util/const.dart';
@@ -36,7 +37,9 @@ class _StatsPageState extends State<StatsPage> {
         title: Const.buildContent("Durumum", textSize: 17),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              context.push(const PieChartPage());
+            },
             icon: Icon(Icons.donut_small_outlined,color: bloc.isDarkTheme ? white : black,),
           ),
         ],

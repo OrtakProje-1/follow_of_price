@@ -1,17 +1,24 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:follow_of_price/json/expenses_categories.dart';
 import 'package:follow_of_price/json/salary_categories.dart';
 import 'package:follow_of_price/main.dart';
 import 'package:follow_of_price/models/category.dart';
 import 'package:follow_of_price/models/payment_method.dart';
 import 'package:follow_of_price/models/price.dart';
+import 'package:follow_of_price/models/save_model.dart';
 import 'package:follow_of_price/models/user.dart';
 import 'package:follow_of_price/pages/update_price.dart';
 import 'package:follow_of_price/providers/global.dart';
 import 'package:follow_of_price/theme/colors.dart';
+import 'package:follow_of_price/widget/calculator/ui.dart';
 import 'package:follow_of_price/widget/month_picker.dart';
 import 'package:follow_of_price/util/extensions.dart';
 export 'package:follow_of_price/util/extensions.dart';
@@ -174,6 +181,7 @@ class Const {
 
     DateTime today =
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    time = DateTime(time.year, time.month, time.day);
     int dif = today.difference(time).inDays;
     if (isTodayString) {
       if (dif == 0) {
@@ -191,6 +199,20 @@ class Const {
         time.year.toString();
   }
 
+  static Widget outlinedButton(String text, {VoidCallback? onPressed}) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      child: Const.buildContent(text),
+      style: OutlinedButton.styleFrom(
+        primary: Const.primaryColor,
+        side: BorderSide(
+          color: grey.withOpacity(0.4),
+        ),
+        shape: const StadiumBorder(),
+      ),
+    );
+  }
+
   static String dateToString(DateTime time) {
     String day = time.day < 10 ? "0${time.day}" : time.day.toString();
     String month = time.month < 10 ? "0${time.month}" : time.month.toString();
@@ -200,7 +222,7 @@ class Const {
     return day + "-" + month + "-" + year;
   }
 
-  static Widget buildLatestWidget(Price price) {
+  static Widget buildLatestWidget(Price price, BuildContext context) {
     return Slidable(
       direction: Axis.horizontal,
       endActionPane: ActionPane(
@@ -216,7 +238,17 @@ class Const {
             label: 'Düzenle',
           ),
           SlidableAction(
-            onPressed: (c) {},
+            onPressed: (c) {
+              showCheckDialog(
+                      context, "Bu işlemi silmek istediğine emin misin?")
+                  .then((value) {
+                if (value != null) {
+                  if (value) {
+                    bloc.removePrice(price);
+                  }
+                }
+              });
+            },
             backgroundColor: red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
@@ -239,18 +271,71 @@ class Const {
           padding: const EdgeInsets.all(4.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Const.cardColor.withOpacity(0.2),
+            color: Const.primaryColor.withOpacity(0.1),
           ),
           child: Const.svg(price.category.imagePath!, height: 30, width: 30),
         ),
         trailing: Text(
-          "₺" + price.amount.toStringAsFixed(2),
+          (price.isExpense ? "-" : "") + price.amount.toStringAsFixed(1) + " ₺",
           style: TextStyle(
               color: bloc.isDarkTheme ? white : black,
               fontSize: 12,
               fontWeight: FontWeight.bold),
         ),
       ),
+    );
+  }
+
+  static showMsg(String msg, {Toast toastLength = Toast.LENGTH_SHORT}) {
+    Fluttertoast.showToast(msg: msg, toastLength: toastLength);
+  }
+
+  static Future<bool?> showCheckDialog(BuildContext context, String content) {
+    return showDialog<bool>(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Const.backgroundColor,
+          title: Text(
+            "Emin misin?",
+            style: TextStyle(
+              color: bloc.isDarkTheme ? white : black,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            content,
+            style: TextStyle(
+              color: bloc.isDarkTheme ? white : black,
+              fontSize: 15,
+            ),
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: bloc.isDarkTheme ? white : black,
+              ),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text("Hayır"),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: bloc.isDarkTheme ? white : black,
+              ),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text("Evet"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -324,10 +409,44 @@ class Const {
     );
   }
 
-  static Widget shopGif({double radius=100}) {
+  static Future<double?> showCalculateSheet(BuildContext context,
+      {double initial = 0}) {
+    return showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: bloc.isDarkTheme ? Const.backgroundColor : white,
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(22),
+          ),
+        ),
+        builder: (_) {
+          return SizedBox(
+            height: context.height * 0.65,
+            child: SimpleCalculator(
+              theme: CalculatorThemeData(
+                borderRadius: 22,
+                commandColor: bloc.isDarkTheme ? black : white,
+                commandStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: bloc.isDarkTheme ? white : black,
+                ),
+                displayStyle: TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                  color: bloc.isDarkTheme ? white : black,
+                ),
+              ),
+              value: initial,
+            ),
+          );
+        });
+  }
+
+  static Widget shopGif({double radius = 100}) {
     return CircleAvatar(
       radius: radius,
-      backgroundImage:const AssetImage("assets/gifs/shop.gif"),
+      backgroundImage: const AssetImage("assets/gifs/shop.gif"),
     );
   }
 
@@ -335,6 +454,55 @@ class Const {
     return (usersBox!.get("users", defaultValue: []) as List<dynamic>).map((e) {
       return User.fromJson(e.toString());
     }).toList();
+  }
+
+  static List<SaveModel> getSaveModels() {
+    List<SaveModel> saveModels = [];
+    for (var i in getUsers()) {
+      String? data = datasBox!.get(i.id.toString());
+      if (data != null) {
+        saveModels.add(SaveModel.fromJson(data));
+      }
+    }
+    return saveModels;
+  }
+
+  static Future<bool> getBackup() async {
+    FilePickerResult? value = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ["txt"],
+    );
+    try {
+      if (value != null) {
+        if (value.files.isNotEmpty) {
+          File file = File(value.files.first.path!);
+          String saveModelTxt = await file.readAsString();
+          List<SaveModel> saveModels =
+              (jsonDecode(saveModelTxt)["saveModels"] as List)
+                  .map((e) => SaveModel.fromJson(e.toString()))
+                  .toList();
+          List<User> users = saveModels.map((e) => e.user).toList();
+          List<User> savedUsers = Const.getUsers();
+          for (var i in saveModels) {
+            if (!savedUsers.any((element) => element.id == i.user.id)) {
+              datasBox!.put(i.user.id.toString(), i.toJson());
+            }
+          }
+          for (var user in users) {
+            if (!savedUsers.any((element) => element == user)) {
+              savedUsers.add(user);
+            }
+          }
+          usersBox!.put("users", users.map((e) => e.toJson()).toList());
+          Const.showMsg("Yedeklenmiş Veriler Yüklendi");
+        }
+      }
+      return true;
+    } on Exception catch (e) {
+      Const.showMsg("Hata: " + e.toString());
+      return false;
+    }
   }
 }
 

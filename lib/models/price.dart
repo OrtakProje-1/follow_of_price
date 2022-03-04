@@ -4,6 +4,7 @@ import 'package:follow_of_price/models/category.dart';
 import 'package:follow_of_price/models/payment_method.dart';
 
 class Price {
+  int id;
   double amount;
   DateTime time;
   bool isExpense;
@@ -11,6 +12,7 @@ class Price {
   String description;
   PaymentMethod paymentMethod;
   Price({
+    required this.id,
     required this.amount,
     required this.time,
     required this.isExpense,
@@ -20,6 +22,7 @@ class Price {
   });
 
   Price copyWith({
+    int? id,
     double? amount,
     DateTime? time,
     bool? isExpense,
@@ -28,6 +31,7 @@ class Price {
     PaymentMethod? paymentMethod,
   }) {
     return Price(
+      id: id ?? this.id,
       amount: amount ?? this.amount,
       time: time ?? this.time,
       isExpense: isExpense ?? this.isExpense,
@@ -39,6 +43,7 @@ class Price {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'amount': amount,
       'time': time.millisecondsSinceEpoch,
       'isExpense': isExpense,
@@ -50,6 +55,7 @@ class Price {
 
   factory Price.fromMap(Map<String, dynamic> map) {
     return Price(
+      id: map['id']?.toInt() ?? 0,
       amount: map['amount']?.toDouble() ?? 0.0,
       time: DateTime.fromMillisecondsSinceEpoch(map['time']),
       isExpense: map['isExpense'] ?? false,
@@ -65,29 +71,31 @@ class Price {
 
   @override
   String toString() {
-    return 'Price(amount: $amount, time: $time, isExpense: $isExpense, category: $category, description: $description, paymentMethod: $paymentMethod)';
+    return 'Price(id: $id, amount: $amount, time: $time, isExpense: $isExpense, category: $category, description: $description, paymentMethod: $paymentMethod)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is Price &&
-      other.amount == amount &&
-      other.time == time &&
-      other.isExpense == isExpense &&
-      other.category == category &&
-      other.description == description &&
-      other.paymentMethod == paymentMethod;
+        other.id == id &&
+        other.amount == amount &&
+        other.time == time &&
+        other.isExpense == isExpense &&
+        other.category == category &&
+        other.description == description &&
+        other.paymentMethod == paymentMethod;
   }
 
   @override
   int get hashCode {
-    return amount.hashCode ^
-      time.hashCode ^
-      isExpense.hashCode ^
-      category.hashCode ^
-      description.hashCode ^
-      paymentMethod.hashCode;
+    return id.hashCode ^
+        amount.hashCode ^
+        time.hashCode ^
+        isExpense.hashCode ^
+        category.hashCode ^
+        description.hashCode ^
+        paymentMethod.hashCode;
   }
 }

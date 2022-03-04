@@ -38,7 +38,7 @@ class _ChangeUserState extends State<ChangeUser> {
           actions: [
             IconButton(
               onPressed: () {
-                context.push(const CreateUser());
+                context.push(const CreateUser(isProfile: true,));
                 bloc.setIndex(0);
               },
               icon: Icon(

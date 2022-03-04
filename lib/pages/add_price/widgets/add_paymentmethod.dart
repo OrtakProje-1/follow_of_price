@@ -48,7 +48,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 16,
+                    radius: 20,
                     backgroundColor: widget.isExpenses ? red : green,
                     child: Icon(
                       widget.isExpenses
@@ -119,17 +119,12 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  DottedBorder(
-                    dashPattern: const [3.3, 3.3],
-                    borderType: BorderType.Circle,
-                    color: Const.primaryColor,
-                    child: CircleAvatar(
-                      radius: 16,
-                      backgroundColor: grey.withOpacity(0.2),
-                      child: Icon(
-                        Icons.info_outline_rounded,
-                        color: Const.primaryColor,
-                      ),
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: grey.withOpacity(0.2),
+                    child:const Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.blue,
                     ),
                   ),
                   const SizedBox(
@@ -164,7 +159,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Const.primaryColor.withOpacity(bloc.isDarkTheme ? 0.4 : 0.1),
+                    color: Const.primaryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Const.svg(widget.category.imagePath!,
